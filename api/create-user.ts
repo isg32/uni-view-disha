@@ -1,5 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
+/**
+ * Creates a Clerk user identified by username + password.
+ * Requires the Clerk instance to have "Username" enabled as an identifier:
+ *   Clerk Dashboard → User & Authentication → Email, Phone, Username → turn on "Username"
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -10,8 +15,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const secretKey = process.env.CLERK_SECRET_KEY
   if (!secretKey) return res.status(500).json({ error: 'CLERK_SECRET_KEY not set' })
 
-  const { email, password, firstName, lastName, role, universitySlug } = req.body as {
-    email: string
+  const { username, password, firstName, lastName, role, universitySlug } = req.body as {
+    username: string
     password: string
     firstName?: string
     lastName?: string
@@ -19,19 +24,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     universitySlug?: string
   }
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'email and password are required' })
+  if (!username || !password) {
+    return res.status(400).json({ error: 'username and password are required' })
   }
 
   try {
-    const body: Record<string, unknown> = {
-      email_address: [email],
-      password,
-    }
+    const body: Record<string, unknown> = { username, password }
     if (firstName) body.first_name = firstName
     if (lastName) body.last_name = lastName
 
-    // Build publicMetadata only if provided
     const publicMetadata: Record<string, unknown> = {}
     if (role) publicMetadata.role = role
     if (universitySlug) publicMetadata.universitySlug = universitySlug
@@ -52,14 +53,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(clerkRes.status).json({ error: msg })
     }
 
-    const primary = (data.email_addresses as { email_address: string; id: string }[])
-      .find(e => e.id === data.primary_email_address_id)
-
     return res.status(200).json({
       success: true,
       user: {
         id: data.id,
-        email: primary?.email_address ?? email,
+        username: data.username ?? '',
+        email: '',           // username-only users have no email
         firstName: data.first_name ?? null,
         lastName: data.last_name ?? null,
         imageUrl: data.image_url,

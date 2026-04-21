@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 interface ClerkUser {
   id: string
+  username: string
   email: string
   firstName: string | null
   lastName: string | null
@@ -13,7 +14,7 @@ interface ClerkUser {
 }
 
 interface CreateForm {
-  email: string
+  username: string
   password: string
   firstName: string
   lastName: string
@@ -22,7 +23,7 @@ interface CreateForm {
 }
 
 const EMPTY_FORM: CreateForm = {
-  email: '', password: '', firstName: '', lastName: '', role: '', universitySlug: '',
+  username: '', password: '', firstName: '', lastName: '', role: '', universitySlug: '',
 }
 
 export default function ManageUsers() {
@@ -83,8 +84,8 @@ export default function ManageUsers() {
   }
 
   const handleCreate = async () => {
-    if (!createForm.email || !createForm.password) {
-      setCreateError('Email and password are required.')
+    if (!createForm.username || !createForm.password) {
+      setCreateError('Username and password are required.')
       return
     }
     setCreating(true)
@@ -94,7 +95,7 @@ export default function ManageUsers() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: createForm.email,
+          username: createForm.username,
           password: createForm.password,
           firstName: createForm.firstName || undefined,
           lastName: createForm.lastName || undefined,
@@ -135,6 +136,7 @@ export default function ManageUsers() {
 
   const filtered = users.filter(u =>
     !search.trim() ||
+    u.username.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     [u.firstName, u.lastName].filter(Boolean).join(' ').toLowerCase().includes(search.toLowerCase()) ||
     (u.publicMetadata.universitySlug ?? '').toLowerCase().includes(search.toLowerCase())
@@ -258,9 +260,10 @@ export default function ManageUsers() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email <span style={{ color: 'var(--danger)' }}>*</span></label>
-              <input className="form-input" type="email" placeholder="user@example.com" value={createForm.email}
-                onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))} />
+              <label className="form-label">Username <span style={{ color: 'var(--danger)' }}>*</span></label>
+              <input className="form-input" placeholder="rahul_sharma" value={createForm.username}
+                onChange={e => setCreateForm(f => ({ ...f, username: e.target.value }))} />
+              <span className="form-hint">Used to sign in. Lowercase, no spaces.</span>
             </div>
 
             <div className="form-group">
@@ -359,9 +362,10 @@ function UserRow({
   const [dirty, setDirty] = useState(false)
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
-  const emailPrefix = user.email.split('@')[0]
-  const displayName = fullName || emailPrefix
-  const initials = displayName.split(/[\s._-]+/).map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  // Username is the primary identifier; fall back to email prefix if no username
+  const primaryId = user.username || user.email.split('@')[0]
+  const subtitle = fullName || user.email || ''
+  const initials = primaryId.split(/[\s._-]+/).map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
 
   return (
     <tr style={{ opacity: deleting ? 0.4 : 1, transition: 'opacity 0.2s' }}>
@@ -370,8 +374,8 @@ function UserRow({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div className="user-chip-avatar" style={{ width: 36, height: 36, fontSize: 13 }}>{initials}</div>
           <div>
-            <div className="user-email">{displayName}</div>
-            <div className="user-id">{user.email}</div>
+            <div className="user-email">{primaryId}</div>
+            {subtitle && <div className="user-id">{subtitle}</div>}
           </div>
         </div>
       </td>

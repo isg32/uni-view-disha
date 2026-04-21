@@ -25,6 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const users = clerkUsers.map((u: {
       id: string
+      username: string | null
       email_addresses: { email_address: string; id: string }[]
       primary_email_address_id: string
       first_name: string | null
@@ -35,6 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const primary = u.email_addresses.find(e => e.id === u.primary_email_address_id)
       return {
         id: u.id,
+        username: u.username ?? '',
         email: primary?.email_address ?? '',
         firstName: u.first_name,
         lastName: u.last_name,
