@@ -51,7 +51,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <span>🎓 Disha-Unis</span>
+          <img src="/dishalogo.png" alt="Disha Logo" />
           <small>Admin Panel</small>
         </div>
 

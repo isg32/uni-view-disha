@@ -8,7 +8,9 @@ function LoginPage() {
   return (
     <div className="auth-wrapper">
       <div className="auth-box">
-        <div className="auth-logo">🎓 Disha-Unis</div>
+        <div className="auth-logo">
+          <img src="/dishalogo.png" alt="Disha Logo" />
+        </div>
         <SignIn routing="hash" />
       </div>
     </div>
