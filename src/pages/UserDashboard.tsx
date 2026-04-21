@@ -90,7 +90,7 @@ export default function UserDashboard() {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <span>🎓 Disha-Unis</span>
+          <img src="/dishalogo.png" alt="Disha Logo" />
           <small>{universitySlug || 'Dashboard'}</small>
         </div>
 
