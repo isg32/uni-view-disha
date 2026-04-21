@@ -152,19 +152,31 @@ export default function DataTable({ data, columns }: Props) {
         </div>
         <button
           id="btn-export-csv"
-          className="btn btn-ghost btn-sm"
+          className="btn btn-sm"
+          style={{
+            background: 'rgba(16,185,129,0.12)',
+            border: '1px solid rgba(16,185,129,0.4)',
+            color: '#10b981',
+            fontWeight: 700,
+          }}
           onClick={() => downloadCSV(sorted, columns)}
           title="Export visible rows as CSV"
         >
-          ↓ CSV
+          ⬇ CSV
         </button>
         <button
           id="btn-export-xlsx"
-          className="btn btn-ghost btn-sm"
+          className="btn btn-sm"
+          style={{
+            background: 'rgba(99,102,241,0.15)',
+            border: '1px solid rgba(99,102,241,0.45)',
+            color: 'var(--accent-2)',
+            fontWeight: 700,
+          }}
           onClick={() => downloadXLSX(sorted, columns)}
           title="Export visible rows as Excel XLSX"
         >
-          ↓ XLSX
+          ⬇ Excel
         </button>
       </div>
 
